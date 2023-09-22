@@ -1,14 +1,14 @@
 import Answer from "./Answer";
 
 const answers = [
-  { id: 1, correct: true, hex: "#9170c6",  time: 5 },
+  { id: 1, correct: true, hex: "#9170c6", time: 5 },
   { id: 2, correct: false, hex: "#587ec9", correctHex: "#0a1f4b", time: 1 },
   { id: 3, correct: true, hex: "#8ad06d", time: 2 },
 ];
 
 const GameList: React.FC = () => {
   return (
-    <div className="w-2/12 h-screen bg-gameListBackground break-words overflow-y-scroll">
+    <div className="w-2/12 bg-gameListBackground break-words overflow-y-scroll">
       <div className="text-center text-xl font-black my-5">
         Current/Latest game
       </div>

@@ -1,4 +1,4 @@
-import { changeTextColor } from "./../../logic/utils/TextColor";
+import ColorCard from "./ColorCard";
 
 interface IAnswerProps {
   /** A bolean to distinguish correct and incorrect answers */
@@ -21,25 +21,16 @@ const Answer: React.FC<IAnswerProps> = ({
     <div className="w-full h-20 flex items-center odd:bg-gray-300">
       {isCorrect ? (
         <>
-          <div
-            className={`ml-1 mr-1 w-2/3 h-12 rounded bg-[${hex}] flex justify-center items-center text-`}
-          >
-            {hex}
-          </div>
+          <ColorCard className="ml-1 mr-1 w-2/3" backgroundColor={hex} />
           <div className="w-1/3 text-center font-bold">{`✅ ${time}s`}</div>
         </>
       ) : (
         <>
-          <div
-            className={`ml-1 mr-1 w-1/3 h-12 rounded bg-[${hex}] flex justify-center items-center`}
-          >
-            #587ec9
-          </div>
-          <div
-            className={`ml-1 mr-2 w-1/3 h-12 rounded bg-[${correctHex}] flex justify-center items-center`}
-          >
-            #0a1f4b
-          </div>
+          <ColorCard className="ml-1 mr-1 w-1/3" backgroundColor={hex} />
+          <ColorCard
+            className="ml-1 mr-2 w-1/3"
+            backgroundColor={correctHex!}
+          />
           <div className="w-1/3 text-center font-bold">{`❌ ${time}s`}</div>
         </>
       )}
