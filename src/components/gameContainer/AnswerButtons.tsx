@@ -1,19 +1,27 @@
 interface IAnswerButtonsProps {
+  /** The color option */
   color: string;
+  /** Additional styles that can be inserted */
   className: string;
-  sendAnswer: (color: string) => void;
+  /** A boolean to check if the user is in a round or not. */
+  isPlaying: boolean;
+  /** A function called to send a response
+   * based on the button clicked */
+  sendAnswer: () => void;
 }
 
 const AnswerButtons: React.FC<IAnswerButtonsProps> = ({
-  color,
   className,
+  color,
+  isPlaying,
   sendAnswer,
 }) => {
   return (
     <>
       <button
-        onClick={() => sendAnswer(color)}
-        className={`w-1/3 h-full border-y-2 border-[#5e676f] hover:bg-gray-100 ${className}`}
+        disabled={!isPlaying}
+        onClick={() => sendAnswer()}
+        className={`w-1/3 h-full border-y-2 ${isPlaying && 'hover:bg-gray-100'} ${className}`}
       >
         {color}
       </button>

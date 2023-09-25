@@ -1,55 +1,69 @@
 import { generateRandomColor } from "@/logic/utils/RandomColor";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+interface IGameState {
+  /** The current round's color */
+  currentColor: string;
+  /** A boolean to check if the game was started */
+  hasGameStarted: boolean;
+  /** The user's highscore */
+  highScore: number;
+  /** Indicates that it's the last round of the game */
+  isLastRound: boolean;
+  /** A boolean to check if the user is in a round or not. */
+  isPlaying: boolean;
+  /** Indicates the time remaining in last round */
+  lastRoundTimeRemaining: number | null;
+  /** The current round's answers options */
+  options: string[];
+  /** The user's current score */
+  score: number;
+  /** The game remaining time */
+  time: number;
+}
+
+const initialState: IGameState = {
+  currentColor: generateRandomColor(),
+  hasGameStarted: false,
+  highScore: 0,
+  isLastRound: false,
+  isPlaying: false,
+  lastRoundTimeRemaining: null,
+  options: [],
+  score: 0,
+  time: 15,
+};
+
 const useGame = () => {
-  const [time, setTime] = useState<number>(30);
-  const [score, setScore] = useState<number>(0);
-  const [highScore, setHighScore] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [hasGameStarted, setHasGameStarted] = useState<boolean>(false);
-  const [currentColor, setCurrentColor] = useState<string | undefined>();
-  const [options, setOptions] = useState<string[]>([]);
+  const [state, setState] = useState<IGameState>(initialState);
   const progressBarTime = useRef<number>(10);
 
   /** Starts the game */
   const handleStartGame = () => {
-    setHasGameStarted(true);
-    setIsPlaying(true);
+    handleCreateRound();
+    setState((prev) => ({
+      ...prev,
+      isPlaying: true,
+      hasGameStarted: true,
+    }));
   };
 
   /** Ends the game when the timer reaches 0, or when
    *  the user clicks on the restart button. */
-  const handleStopGame = () => {
-    setHasGameStarted(false);
-    setScore(0);
-    setTime(30);
-    setCurrentColor(generateRandomColor());
+  const handleStopGame = useCallback(() => {
+    if (state.score > 0 && state.score > state.highScore && state.time == 0) {
+      setState(() => ({
+        ...initialState,
+        highScore: state.score,
+      }));
+    } else {
+      setState(initialState);
+    }
     progressBarTime.current = 10;
-  };
+  }, [state.score, state.highScore, state.time]);
 
-  /** Check the answer if it was given, if not, just reduce the score.
-   * @param result The answer data
-   */
-  const handleCheckAnswer = useCallback(
-    (result: string) => {
-      setIsPlaying(false);
-      switch (result) {
-        default:
-          setScore((prev) => prev - 2);
-      }
-      setTimeout(() => {
-        if (time - 1 != 0) {
-          const color = generateRandomColor();
-          setCurrentColor(color);
-          setIsPlaying(true);
-          progressBarTime.current = 10;
-        }
-      }, 1000);
-    },
-    [time]
-  );
-
-  useEffect(() => {
+  /** Creates a game round */
+  const handleCreateRound = () => {
     const _currentColor: string = generateRandomColor();
     // Creates an array to store both incorrect
     // and the correct answer options
@@ -62,51 +76,109 @@ const useGame = () => {
     for (let i = _options.length - 1; i > 0; i--) {
       // Generates a random index between 0 and the array length
       const j = Math.floor(Math.random() * (i + 1));
-      // Swaps elements at i and j
+      // Swaps elements at i and j indexes
       [_options[i], _options[j]] = [_options[j], _options[i]];
     }
-    setOptions(_options);
-    setCurrentColor(_currentColor);
+    setState((prev) => ({
+      ...prev,
+      currentColor: _currentColor,
+      options: _options,
+    }));
+  };
+
+  /** Check the answer if it was given, if not, just reduce the score.
+   * @param result The answer data
+   */
+  const handleCheckAnswer = useCallback(
+    (result: string) => {
+      setState((prev) => ({
+        ...prev,
+        isPlaying: false,
+      }));
+      let _score = state.score;
+      switch (result) {
+        case "correct":
+          _score += 5;
+          break;
+        case "incorrect":
+          if (state.score > 0) {
+            _score -= 1;
+          }
+          break;
+        default:
+          if (state.score > 0) {
+            _score -= 2;
+          }
+          break;
+      }
+      setState((prev) => ({
+        ...prev,
+        score: _score,
+      }));
+      setTimeout(() => {
+        if (state.time != 0) {
+          handleCreateRound();
+          setState((prev) => ({
+            ...prev,
+            isPlaying: true,
+          }));
+          if (state.time >= 10) {
+            progressBarTime.current = 10;
+          } else {
+            setState((prev) => ({
+              ...prev,
+              isLastRound: true,
+              lastRoundTimeRemaining: state.time,
+            }));
+            progressBarTime.current = state.time;
+          }
+        }
+      }, 1500);
+    },
+    [state.score, state.time]
+  );
+
+  useEffect(() => {
+    handleCreateRound();
   }, []);
 
   useEffect(() => {
     let countdownTimer: NodeJS.Timeout;
-    if (hasGameStarted && time > 0) {
-      if (isPlaying) {
+    if (state.hasGameStarted && state.time > 0) {
+      if (state.isPlaying) {
         countdownTimer = setTimeout(() => {
-          setTime((prev) => prev - 1);
-          setScore((prev) => prev + 1);
+          setState((prev) => ({
+            ...prev,
+            time: state.time - 1,
+          }));
           progressBarTime.current -= 1;
-          if (progressBarTime.current == 0) {
-            handleCheckAnswer("notAnswered");
-          }
         }, 1000);
       }
     } else {
-      if (score > 0 && score > highScore) {
-        setHighScore(score);
+      if (state.isPlaying) {
+        handleStopGame();
       }
-      handleStopGame();
     }
     return () => clearTimeout(countdownTimer);
   }, [
-    time,
-    hasGameStarted,
-    score,
-    highScore,
-    progressBarTime,
-    isPlaying,
     handleCheckAnswer,
+    handleStopGame,
+    progressBarTime,
+    state.isPlaying,
+    state.hasGameStarted,
+    state.time,
   ]);
 
+  useEffect(() => {
+    if (progressBarTime.current == 0 && state.time != 0) {
+      handleCheckAnswer("notAnswered");
+    }
+  }, [handleCheckAnswer, state.time]);
+
   return {
-    time,
-    score,
-    highScore,
-    hasGameStarted,
     progressBarTime: progressBarTime.current,
-    currentColor,
-    options,
+    state,
+    handleCheckAnswer,
     handleStartGame,
     handleStopGame,
   };

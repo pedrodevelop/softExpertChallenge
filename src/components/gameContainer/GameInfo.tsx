@@ -1,51 +1,56 @@
 interface IGameInfoProps {
-  /** The game remaining time */
-  time: number;
+  /** A boolean to check if the game has started */
+  hasGameStarted: boolean;
   /** The user's highscore */
   highScore: number;
   /** The user's current score */
   score: number;
+  /** The game remaining time */
+  time: number;
   /** A function called when the game is finished,
    *  or to restart the game */
   handleStopGame: () => void;
 }
 
 const GameInfo: React.FC<IGameInfoProps> = ({
-  time,
+  hasGameStarted,
   highScore,
   score,
+  time,
   handleStopGame,
 }) => {
   return (
     <div className="flex flex-row w-2/6">
       <div
         className="flex flex-col items-center justify-center w-2/5 h-24 rounded-l
-   border-2 border-[#99a1ab] bg-[#e5e9f0] text-sm font-extrabold"
+        border-2 border-[#99a1ab] bg-[#e5e9f0] lg:text-sm font-extrabold sm:text-xs"
       >
         <p>REMAINING TIME (s)</p>
-        <p className="my-1 text-2xl">{time}</p>
+        <p className="my-1 lg:text-2xl sm:text-lg">{time}</p>
       </div>
       <button
+        className={`flex items-center justify-center w-1/5 h-24 border-y-2 border-[#99a1ab]
+                    text-xs ${!hasGameStarted ? "bg-[#d2d7df] text-[#e2e6ec]": "bg-[#aab1ba] text-white"}
+                  `}
+        disabled={!hasGameStarted}
         onClick={handleStopGame}
-        className="flex items-center justify-center w-1/5 h-24 border-y-2
-  border-[#99a1ab] bg-[#aab1ba] text-xs text-white"
       >
         <p>RESTART</p>
       </button>
       <div
         className="flex flex-col w-2/5 h-24 rounded-r border-2
-  border-[#99a1ab] bg-[#e5e9f0] text-sm font-extrabold"
+      border-[#99a1ab] bg-[#e5e9f0] text-sm font-extrabold"
       >
         <div
           className="flex items-center justify-between h-1/2 border-b-2
-  border-[#99a1ab]"
+        border-[#99a1ab] p-3"
         >
-          <p className="mx-5">HIGH SCORE</p>
-          <p className="mx-5 text-2xl">{highScore}</p>
+          <p className="sm:text-xs lg:text-base">HIGH SCORE</p>
+          <p className="sm:text-lg lg:text-2xl">{highScore}</p>
         </div>
-        <div className="flex items-center justify-between h-1/2">
-          <p className="mx-5">SCORE</p>
-          <p className="mx-5 text-2xl">{score}</p>
+        <div className="flex items-center justify-between h-1/2 p-3">
+          <p className="sm:text-xs lg:text-base">SCORE</p>
+          <p className="sm:text-lg lg:text-2xl">{score}</p>
         </div>
       </div>
     </div>

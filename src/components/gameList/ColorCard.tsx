@@ -1,15 +1,15 @@
 import { changeTextColor } from "@/logic/utils/TextColor";
 
 interface IColorCardProps {
-  /** The card background color */
-  backgroundColor: string;
   /** Additional styles that can be inserted */
   className: string;
+  /** The card background color */
+  backgroundColor: string;
 }
 
 const ColorCard: React.FC<IColorCardProps> = ({
-  backgroundColor,
   className,
+  backgroundColor,
 }) => {
   return (
     <div
@@ -17,7 +17,7 @@ const ColorCard: React.FC<IColorCardProps> = ({
         backgroundColor: backgroundColor,
         color: changeTextColor(backgroundColor!),
       }}
-      className={`h-12 rounded flex justify-center items-center ${className}`}
+      className={`h-12 rounded flex justify-center items-center sm:text-xs lg:text-base ${className}`}
     >
       {backgroundColor}
     </div>

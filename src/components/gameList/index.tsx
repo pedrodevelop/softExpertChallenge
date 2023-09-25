@@ -24,9 +24,9 @@ const GameList: React.FC = () => {
       {answers.map((e) => (
         <Answer
           key={e.id}
-          isCorrect={e.correct}
-          hex={e.hex}
           correctHex={e.correctHex}
+          hex={e.hex}
+          isCorrect={e.correct}
           time={e.time}
         />
       ))}

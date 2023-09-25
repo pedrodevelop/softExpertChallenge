@@ -1,35 +1,35 @@
 import ColorCard from "./ColorCard";
 
 interface IAnswerProps {
-  /** A bolean to distinguish correct and incorrect answers */
-  isCorrect: boolean;
-  /** The correct color that was guessed */
-  hex: string;
   /** The correct color that should be guessed */
   correctHex?: string;
+  /** The correct color that was guessed */
+  hex: string;
+  /** A bolean to distinguish correct and incorrect answers */
+  isCorrect: boolean;
   /** Time (seconds) the user took to respond */
   time: number;
 }
 
 const Answer: React.FC<IAnswerProps> = ({
-  isCorrect,
-  hex,
   correctHex,
+  hex,
+  isCorrect,
   time,
 }) => {
   return (
     <div className="w-full h-20 flex items-center odd:bg-gray-300">
       {isCorrect ? (
         <>
-          <ColorCard className="ml-1 mr-1 w-2/3" backgroundColor={hex} />
+          <ColorCard backgroundColor={hex} className="ml-1 mr-1 w-2/3" />
           <div className="w-1/3 text-center font-bold">{`✅ ${time}s`}</div>
         </>
       ) : (
         <>
-          <ColorCard className="ml-1 mr-1 w-1/3" backgroundColor={hex} />
+          <ColorCard backgroundColor={hex} className="ml-1 mr-1 w-1/3" />
           <ColorCard
-            className="ml-1 mr-2 w-1/3"
             backgroundColor={correctHex!}
+            className="ml-1 mr-2 w-1/3"
           />
           <div className="w-1/3 text-center font-bold">{`❌ ${time}s`}</div>
         </>
