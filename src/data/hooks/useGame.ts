@@ -2,6 +2,8 @@ import { generateRandomColor } from "@/logic/utils/RandomColor";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface IGameAnswer {
+  /** Answer object id */
+  id: number;
   /** Indicates whether the answer is correct or not */
   correct: boolean;
   /** If the answer is wrong, indicate which answer is correct */
@@ -57,27 +59,52 @@ const useGame = () => {
     handleCreateRound();
     setState((prev) => ({
       ...prev,
+      answers: [],
       isPlaying: true,
       hasGameStarted: true,
     }));
   };
 
-  /** Ends the game when the timer reaches 0, or when
-   *  the user clicks on the restart button. */
+  /** Ends the game when the timer reaches 0 */
   const handleStopGame = useCallback(() => {
-    if (state.score > 0 && state.score > state.highScore && state.time == 0) {
+    if (state.score > 0 && state.score > state.highScore) {
       setState(() => ({
         ...initialState,
         highScore: state.score,
+        answers: state.answers,
       }));
     } else {
       setState(() => ({
         ...initialState,
         highScore: state.highScore,
+        answers: state.answers,
       }));
     }
+    const gameData = JSON.stringify([
+      state.score > 0 && state.score > state.highScore
+        ? state.score
+        : state.highScore,
+      state.answers,
+    ]);
+    localStorage.setItem("gameData", gameData);
+
     progressBarTime.current = 10;
-  }, [state.score, state.highScore, state.time]);
+  }, [state.score, state.highScore, state.answers]);
+
+  /** Restart the game by deleting all match data */
+  const handleRestartGame = () => {
+    const gameData = JSON.parse(localStorage.getItem("gameData"));
+    if (state.highScore > 0 && state.answers) {
+      setState(() => ({
+        ...initialState,
+        highScore: gameData[0],
+        answers: gameData[1],
+      }));
+    } else {
+      setState(initialState);
+    }
+    progressBarTime.current = 10;
+  };
 
   /** Creates a game round */
   const handleCreateRound = () => {
@@ -100,6 +127,7 @@ const useGame = () => {
       ...prev,
       currentColor: _currentColor,
       options: _options,
+      isPlaying: true,
     }));
   };
 
@@ -113,12 +141,12 @@ const useGame = () => {
         isPlaying: false,
       }));
       let _score = state.score;
-      let _result: string;
-      let _answer: IGameAnswer;
+      let _answerResult: string;
+      let _answerData: IGameAnswer;
       if (answer) {
-        _result = answer == state.currentColor ? "correct" : "incorrect";
+        _answerResult = answer == state.currentColor ? "correct" : "incorrect";
       }
-      switch (_result) {
+      switch (_answerResult) {
         case "correct":
           _score += 5;
           break;
@@ -126,17 +154,18 @@ const useGame = () => {
           if (state.score > 0) {
             _score -= 1;
           }
-          _answer = { ..._answer, correctHex: state.currentColor };
+          _answerData = { ..._answerData, correctHex: state.currentColor };
           break;
         default:
           if (state.score > 0) {
             _score -= 2;
           }
-          _answer = { ..._answer, correctHex: state.currentColor };
+          _answerData = { ..._answerData, correctHex: state.currentColor };
           break;
       }
-      _answer = {
-        ..._answer,
+      _answerData = {
+        ..._answerData,
+        id: state.answers.length + 1,
         correct: answer == state.currentColor,
         hex: answer ?? null,
         time: state.isLastRound
@@ -146,32 +175,29 @@ const useGame = () => {
       setState((prev) => ({
         ...prev,
         score: _score,
-        answers: [...state.answers, _answer],
+        answers: [...state.answers, _answerData],
       }));
-      setTimeout(() => {
-        if (state.time - 1 != 0) {
-          handleCreateRound();
-          setState((prev) => ({
-            ...prev,
-            isPlaying: true,
-          }));
-          if (state.time - 1 >= 10) {
+      if (state.time - 1 != 0) {
+        setTimeout(() => {
+          if (state.time >= 10) {
             progressBarTime.current = 10;
           } else {
             setState((prev) => ({
               ...prev,
               isLastRound: true,
-              lastRoundTimeRemaining: state.time,
+              lastRoundTimeRemaining:
+                answer == "" ? state.time - 1 : state.time,
             }));
             progressBarTime.current = state.time;
           }
-        } else {
-          setState((prev) => ({
-            ...prev,
-            isPlaying: false,
-          }));
-        }
-      }, 1500);
+          handleCreateRound();
+        }, 1500);
+      } else {
+        setState((prev) => ({
+          ...prev,
+          isPlaying: true,
+        }));
+      }
     },
     [
       state.answers,
@@ -182,6 +208,23 @@ const useGame = () => {
       state.time,
     ]
   );
+
+  const handleResetGameData = () => {
+    const gameData = JSON.parse(localStorage.getItem("gameData"));
+    if (gameData) localStorage.removeItem("gameData");
+    setState(initialState);
+  };
+
+  useEffect(() => {
+    const gameData = JSON.parse(localStorage.getItem("gameData"));
+    if (gameData) {
+      setState((prev) => ({
+        ...prev,
+        highScore: gameData[0],
+        answers: gameData[1],
+      }));
+    }
+  }, []);
 
   useEffect(() => {
     let countdownTimer: NodeJS.Timeout;
@@ -219,6 +262,8 @@ const useGame = () => {
     handleCheckAnswer,
     handleStartGame,
     handleStopGame,
+    handleRestartGame,
+    handleResetGameData,
   };
 };
 

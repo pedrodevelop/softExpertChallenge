@@ -7,9 +7,8 @@ interface IGameInfoProps {
   score: number;
   /** The game remaining time */
   time: number;
-  /** A function called when the game is finished,
-   *  or to restart the game */
-  handleStopGame: () => void;
+  /** A function called to restart the game */
+  handleRestartGame: () => void;
 }
 
 const GameInfo: React.FC<IGameInfoProps> = ({
@@ -17,7 +16,7 @@ const GameInfo: React.FC<IGameInfoProps> = ({
   highScore,
   score,
   time,
-  handleStopGame,
+  handleRestartGame,
 }) => {
   return (
     <div className="flex flex-row w-2/6">
@@ -33,7 +32,7 @@ const GameInfo: React.FC<IGameInfoProps> = ({
                     text-xs ${!hasGameStarted ? "bg-[#d2d7df] text-[#e2e6ec]": "bg-[#aab1ba] text-white"}
                   `}
         disabled={!hasGameStarted}
-        onClick={handleStopGame}
+        onClick={handleRestartGame}
       >
         <p>RESTART</p>
       </button>

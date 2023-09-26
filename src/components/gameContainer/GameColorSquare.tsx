@@ -25,10 +25,10 @@ const GameColorSquare: React.FC<IGameColorSquareProps> = ({
   handleStartGame,
 }) => {
   // If the game counter is at 10 seconds or more,
-  // simply multiply the time remaining on the progress
+  // simply multiply the remaining time on the progress
   // bar by 10 to get the percentage, otherwise the percentage
   // is found by: x = (N*100)/N2, where N is the current second
-  // and N2 is the number representing 100%.
+  // and N2 is the time that represents 100%.
   const progressBarPercentage = !isLastRound
     ? progressBarTime * 10
     : (time * 100) / lastRoundTimeRemaining;

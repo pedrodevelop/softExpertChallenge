@@ -12,28 +12,28 @@ const GameList: React.FC<IGameListProps> = ({ state }) => {
       <div className="text-center text-xl font-black my-5">
         Current/Latest game
       </div>
-      {state.answers.length > 0 && (
-        <>
-          <div className="flex flex-row items-center border-y-2 border-gray-300">
-            <div className="text-center font-bold p-1 w-1/3 border-r-2 border-gray-300">
-              Guessed color
-            </div>
-            <div className="text-center font-bold p-1 w-1/3 border-r-2 border-gray-300">
-              Correct color
-            </div>
-            <div className="text-center font-bold p-1 w-1/3">Score</div>
+      {(state.answers.length > 0 || state.hasGameStarted) && (
+        <div className="flex flex-row items-center border-y-2 border-gray-300">
+          <div className="text-center font-bold p-1 w-1/3 border-r-2 border-gray-300">
+            Guessed color
           </div>
-        </>
+          <div className="text-center font-bold p-1 w-1/3 border-r-2 border-gray-300">
+            Correct color
+          </div>
+          <div className="text-center font-bold p-1 w-1/3">Score</div>
+        </div>
       )}
-      {state.answers.map((e) => (
-        <Answer
-          key={e.hex}
-          correctHex={e.correctHex}
-          hex={e.hex}
-          isCorrect={e.correct}
-          time={e.time}
-        />
-      ))}
+      <div className="flex flex-col-reverse">
+        {state.answers.map((e) => (
+          <Answer
+            key={e.id}
+            correctHex={e.correctHex}
+            hex={e.hex}
+            isCorrect={e.correct}
+            time={e.time}
+          />
+        ))}
+      </div>
     </div>
   );
 };

@@ -8,7 +8,7 @@ interface IGameContainerProps {
   progressBarTime: number;
   handleCheckAnswer: (answer: string) => void;
   handleStartGame: () => void;
-  handleStopGame: () => void;
+  handleRestartGame: () => void;
 }
 
 const GameContainer: React.FC<IGameContainerProps> = ({
@@ -16,14 +16,14 @@ const GameContainer: React.FC<IGameContainerProps> = ({
   progressBarTime,
   handleCheckAnswer,
   handleStartGame,
-  handleStopGame,
+  handleRestartGame,
 }) => {
   return (
     <div className="flex flex-col items-center justify-center gap-10 w-9/12">
       <div className="font-bold text-5xl mb-5">Guess the color</div>
       {/* Game info with remaining time, and score/highscore */}
       <GameInfo
-        handleStopGame={handleStopGame}
+        handleRestartGame={handleRestartGame}
         hasGameStarted={state.hasGameStarted}
         highScore={state.highScore}
         score={state.score}

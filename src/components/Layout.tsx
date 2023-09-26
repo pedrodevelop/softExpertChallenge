@@ -8,7 +8,8 @@ const Layout: React.FC = () => {
     progressBarTime,
     handleCheckAnswer,
     handleStartGame,
-    handleStopGame,
+    handleRestartGame,
+    handleResetGameData,
   } = useGame();
 
   return (
@@ -19,10 +20,16 @@ const Layout: React.FC = () => {
         progressBarTime={progressBarTime}
         handleCheckAnswer={handleCheckAnswer}
         handleStartGame={handleStartGame}
-        handleStopGame={handleStopGame}
+        handleRestartGame={handleRestartGame}
       />
       <div className="w-1/12 mt-auto mb-10">
-        <p className="w-fit underline cursor-pointer">Reset all data</p>
+        <button
+          className="w-fit underline"
+          disabled={state.hasGameStarted || state.answers.length == 0}
+          onClick={handleResetGameData}
+        >
+          Reset all data
+        </button>
       </div>
     </div>
   );
