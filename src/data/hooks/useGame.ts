@@ -1,7 +1,20 @@
 import { generateRandomColor } from "@/logic/utils/RandomColor";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-interface IGameState {
+interface IGameAnswer {
+  /** Indicates whether the answer is correct or not */
+  correct: boolean;
+  /** If the answer is wrong, indicate which answer is correct */
+  correctHex?: string;
+  /** Indicates the color that should be guessed */
+  hex: string;
+  /** Indicates the time taken by the user in that round */
+  time: number;
+}
+
+export interface IGameState {
+  // /** An array of answers */
+  answers: IGameAnswer[];
   /** The current round's color */
   currentColor: string;
   /** A boolean to check if the game was started */
@@ -23,6 +36,7 @@ interface IGameState {
 }
 
 const initialState: IGameState = {
+  answers: [],
   currentColor: generateRandomColor(),
   hasGameStarted: false,
   highScore: 0,
@@ -57,7 +71,10 @@ const useGame = () => {
         highScore: state.score,
       }));
     } else {
-      setState(initialState);
+      setState(() => ({
+        ...initialState,
+        highScore: state.highScore,
+      }));
     }
     progressBarTime.current = 10;
   }, [state.score, state.highScore, state.time]);
@@ -90,13 +107,18 @@ const useGame = () => {
    * @param result The answer data
    */
   const handleCheckAnswer = useCallback(
-    (result: string) => {
+    (answer: string) => {
       setState((prev) => ({
         ...prev,
         isPlaying: false,
       }));
       let _score = state.score;
-      switch (result) {
+      let _result: string;
+      let _answer: IGameAnswer;
+      if (answer) {
+        _result = answer == state.currentColor ? "correct" : "incorrect";
+      }
+      switch (_result) {
         case "correct":
           _score += 5;
           break;
@@ -104,25 +126,36 @@ const useGame = () => {
           if (state.score > 0) {
             _score -= 1;
           }
+          _answer = { ..._answer, correctHex: state.currentColor };
           break;
         default:
           if (state.score > 0) {
             _score -= 2;
           }
+          _answer = { ..._answer, correctHex: state.currentColor };
           break;
       }
+      _answer = {
+        ..._answer,
+        correct: answer == state.currentColor,
+        hex: answer ?? null,
+        time: state.isLastRound
+          ? state.lastRoundTimeRemaining - progressBarTime.current
+          : 10 - progressBarTime.current,
+      };
       setState((prev) => ({
         ...prev,
         score: _score,
+        answers: [...state.answers, _answer],
       }));
       setTimeout(() => {
-        if (state.time != 0) {
+        if (state.time - 1 != 0) {
           handleCreateRound();
           setState((prev) => ({
             ...prev,
             isPlaying: true,
           }));
-          if (state.time >= 10) {
+          if (state.time - 1 >= 10) {
             progressBarTime.current = 10;
           } else {
             setState((prev) => ({
@@ -132,15 +165,23 @@ const useGame = () => {
             }));
             progressBarTime.current = state.time;
           }
+        } else {
+          setState((prev) => ({
+            ...prev,
+            isPlaying: false,
+          }));
         }
       }, 1500);
     },
-    [state.score, state.time]
+    [
+      state.answers,
+      state.currentColor,
+      state.isLastRound,
+      state.lastRoundTimeRemaining,
+      state.score,
+      state.time,
+    ]
   );
-
-  useEffect(() => {
-    handleCreateRound();
-  }, []);
 
   useEffect(() => {
     let countdownTimer: NodeJS.Timeout;
@@ -152,6 +193,9 @@ const useGame = () => {
             time: state.time - 1,
           }));
           progressBarTime.current -= 1;
+          if (progressBarTime.current == 0 && state.time - 1 != 0) {
+            handleCheckAnswer("");
+          }
         }, 1000);
       }
     } else {
@@ -168,12 +212,6 @@ const useGame = () => {
     state.hasGameStarted,
     state.time,
   ]);
-
-  useEffect(() => {
-    if (progressBarTime.current == 0 && state.time != 0) {
-      handleCheckAnswer("notAnswered");
-    }
-  }, [handleCheckAnswer, state.time]);
 
   return {
     progressBarTime: progressBarTime.current,

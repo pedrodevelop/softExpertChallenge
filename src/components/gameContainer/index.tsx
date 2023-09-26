@@ -1,17 +1,23 @@
-import useGame from "./../../data/hooks/useGame";
+import { IGameState } from "./../../data/hooks/useGame";
 import GameColorSquare from "./GameColorSquare";
 import GameInfo from "./GameInfo";
 import AnswerButtons from "./AnswerButtons";
 
-const GameContainer: React.FC = () => {
-  const {
-    state,
-    progressBarTime,
-    handleCheckAnswer,
-    handleStartGame,
-    handleStopGame,
-  } = useGame();
+interface IGameContainerProps {
+  state: IGameState;
+  progressBarTime: number;
+  handleCheckAnswer: (answer: string) => void;
+  handleStartGame: () => void;
+  handleStopGame: () => void;
+}
 
+const GameContainer: React.FC<IGameContainerProps> = ({
+  state,
+  progressBarTime,
+  handleCheckAnswer,
+  handleStartGame,
+  handleStopGame,
+}) => {
   return (
     <div className="flex flex-col items-center justify-center gap-10 w-9/12">
       <div className="font-bold text-5xl mb-5">Guess the color</div>
@@ -49,9 +55,7 @@ const GameContainer: React.FC = () => {
               }`}
               isPlaying={state.isPlaying}
               sendAnswer={() => {
-                handleCheckAnswer(
-                  el == state.currentColor ? "correct" : "incorrect"
-                );
+                handleCheckAnswer(el);
               }}
             />
           ))}

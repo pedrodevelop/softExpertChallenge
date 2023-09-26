@@ -43,7 +43,7 @@ const GameColorSquare: React.FC<IGameColorSquareProps> = ({
             progressBarPercentage > 60
               ? "bg-green-500"
               : progressBarPercentage < 40
-              ? "bg-red-500"
+              ? "bg-red-600"
               : "bg-yellow-300"
           }`}
           style={{ width: `${progressBarPercentage}%` }}
@@ -52,7 +52,7 @@ const GameColorSquare: React.FC<IGameColorSquareProps> = ({
       <div
         className={`flex items-center justify-center h-full w-full rounded-b`}
         style={{
-          backgroundColor: `${currentColor}`,
+          backgroundColor: currentColor,
         }}
       >
         {!hasGameStarted && (
@@ -60,7 +60,9 @@ const GameColorSquare: React.FC<IGameColorSquareProps> = ({
             <button
               className="flex items-center justify-center w-2/5 h-12
               rounded bg-[#48525c] text-lg text-white"
-              onClick={handleStartGame}
+              onClick={() => {
+                handleStartGame();
+              }}
             >
               <p>START</p>
             </button>

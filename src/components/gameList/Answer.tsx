@@ -26,12 +26,24 @@ const Answer: React.FC<IAnswerProps> = ({
         </>
       ) : (
         <>
-          <ColorCard backgroundColor={hex} className="ml-1 mr-1 w-1/3" />
-          <ColorCard
-            backgroundColor={correctHex!}
-            className="ml-1 mr-2 w-1/3"
-          />
-          <div className="w-1/3 text-center font-bold">{`❌ ${time}s`}</div>
+          {hex ? (
+            <>
+              <ColorCard backgroundColor={hex} className="ml-1 mr-1 w-1/3" />
+              <ColorCard
+                backgroundColor={correctHex!}
+                className="ml-1 mr-2 w-1/3"
+              />
+              <div className="w-1/3 text-center font-bold">{`❌ ${time}s`}</div>
+            </>
+          ) : (
+            <>
+              <ColorCard
+                backgroundColor={correctHex!}
+                className="ml-1 mr-2 w-2/3"
+              />
+              <div className="w-1/3 text-center font-bold">{`❌ ${time}s`}</div>
+            </>
+          )}
         </>
       )}
     </div>
