@@ -31,7 +31,7 @@ const GameColorSquare: React.FC<IGameColorSquareProps> = ({
   // and N2 is the time that represents 100%.
   const progressBarPercentage = !isLastRound
     ? progressBarTime * 10
-    : (time * 100) / lastRoundTimeRemaining;
+    : (time * 100) / lastRoundTimeRemaining!;
 
   return (
     <div className="flex flex-col w-2/6 h-1/2">

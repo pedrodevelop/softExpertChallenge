@@ -93,8 +93,9 @@ const useGame = () => {
 
   /** Restart the game by deleting all match data */
   const handleRestartGame = () => {
-    const gameData = JSON.parse(localStorage.getItem("gameData"));
-    if (state.highScore > 0 && state.answers) {
+    const gameDataStorage = localStorage.getItem("gameData");
+    if (state.highScore > 0 && state.answers && gameDataStorage) {
+      const gameData = JSON.parse(gameDataStorage);
       setState(() => ({
         ...initialState,
         highScore: gameData[0],
@@ -141,7 +142,7 @@ const useGame = () => {
         isPlaying: false,
       }));
       let _score = state.score;
-      let _answerResult: string;
+      let _answerResult: string | undefined;
       let _answerData: IGameAnswer;
       if (answer) {
         _answerResult = answer == state.currentColor ? "correct" : "incorrect";
@@ -154,23 +155,22 @@ const useGame = () => {
           if (state.score > 0) {
             _score -= 1;
           }
-          _answerData = { ..._answerData, correctHex: state.currentColor };
           break;
         default:
           if (state.score > 0) {
             _score -= 2;
           }
-          _answerData = { ..._answerData, correctHex: state.currentColor };
           break;
       }
       _answerData = {
-        ..._answerData,
         id: state.answers.length + 1,
         correct: answer == state.currentColor,
         hex: answer ?? null,
-        time: state.isLastRound
-          ? state.lastRoundTimeRemaining - progressBarTime.current
-          : 10 - progressBarTime.current,
+        correctHex: _answerResult != "correct" ? state.currentColor : undefined,
+        time:
+          state.isLastRound && state.lastRoundTimeRemaining
+            ? state.lastRoundTimeRemaining - progressBarTime.current
+            : 10 - progressBarTime.current,
       };
       setState((prev) => ({
         ...prev,
@@ -210,14 +210,17 @@ const useGame = () => {
   );
 
   const handleResetGameData = () => {
-    const gameData = JSON.parse(localStorage.getItem("gameData"));
-    if (gameData) localStorage.removeItem("gameData");
+    const gameDataStorage = localStorage.getItem("gameData");
+    if (gameDataStorage) {
+      localStorage.removeItem("gameData");
+    }
     setState(initialState);
   };
 
   useEffect(() => {
-    const gameData = JSON.parse(localStorage.getItem("gameData"));
-    if (gameData) {
+    const gameDataStorage = localStorage.getItem("gameData");
+    if (gameDataStorage) {
+      const gameData = JSON.parse(gameDataStorage);
       setState((prev) => ({
         ...prev,
         highScore: gameData[0],
