@@ -28,7 +28,7 @@ const GameList: React.FC<IGameListProps> = ({ state }) => {
             <div className="text-center font-bold p-1 w-1/3">Score</div>
           </div>
         )}
-      <div className="flex flex-col-reverse">
+      <div data-testid="answers-list" className="flex flex-col-reverse">
         {difficulty !== "" &&
           state.answers.map((e) => (
             <Answer

@@ -88,9 +88,12 @@ const GameContainer: React.FC<IGameContainerProps> = ({
             progressBarTime={progressBarTime}
           />
           {/* Round's answers options */}
-          <div className="flex justify-center w-full h-12 font-semibold">
-            {state.hasGameStarted &&
-              state.options.map((el) => (
+          {state.hasGameStarted && (
+            <div
+              data-testid="answers-buttons"
+              className="flex justify-center w-full h-12 font-semibold"
+            >
+              {state.options.map((el) => (
                 <AnswerButtons
                   key={el}
                   color={el}
@@ -107,7 +110,8 @@ const GameContainer: React.FC<IGameContainerProps> = ({
                   }}
                 />
               ))}
-          </div>
+            </div>
+          )}
         </>
       )}
     </div>

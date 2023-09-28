@@ -1,8 +1,8 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 export type GameDifficults = "" | "Easy" | "Normal"| "Hard"
 
-export interface IGameDifficultyProps {
+interface IGameDifficultyProps {
   /** Game difficulty */
   difficulty: GameDifficults;
   /** A function called to set game difficulty */
