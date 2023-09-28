@@ -1,5 +1,6 @@
 import { generateRandomColor } from "@/logic/utils/RandomColor";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useContext } from "react";
+import GameDifficulty from "../contexts/GameDifficultyContext";
 
 interface IGameAnswer {
   /** Answer object id */
@@ -51,6 +52,7 @@ const initialState: IGameState = {
 };
 
 const useGame = () => {
+  const { difficulty } = useContext(GameDifficulty);
   const [state, setState] = useState<IGameState>(initialState);
   const progressBarTime = useRef<number>(10);
   const countDownTime = useRef<number>(state.time);
@@ -108,20 +110,24 @@ const useGame = () => {
 
   /** Creates a game round */
   const handleCreateRound = useCallback(() => {
+    let _optionsLength: number;
+    _optionsLength = difficulty == "Easy" ? 3 : difficulty == "Normal" ? 4 : 5;
     const _currentColor: string = generateRandomColor();
     // Creates an array to store both incorrect
     // and the correct answer options
     const _options: string[] = [];
-    for (let i = 0; i < 2; i++) {
-      _options.push(generateRandomColor());
-    }
-    _options.push(_currentColor);
-    // Shuffles the array
-    for (let i = _options.length - 1; i > 0; i--) {
-      // Generates a random index between 0 and the array length
-      const j = Math.floor(Math.random() * (i + 1));
-      // Swaps elements at i and j indexes
-      [_options[i], _options[j]] = [_options[j], _options[i]];
+    if (_optionsLength) {
+      for (let i = 1; i < _optionsLength!; i++) {
+        _options.push(generateRandomColor());
+      }
+      _options.push(_currentColor);
+      // Shuffles the array
+      for (let i = _options.length - 1; i > 0; i--) {
+        // Generates a random index between 0 and the array length
+        const j = Math.floor(Math.random() * (i + 1));
+        // Swaps elements at i and j indexes
+        [_options[i], _options[j]] = [_options[j], _options[i]];
+      }
     }
     setState((prev) => ({
       ...prev,
@@ -129,8 +135,7 @@ const useGame = () => {
       options: _options,
       isPlaying: true,
     }));
-    console.log(_currentColor);
-  }, []);
+  }, [difficulty]);
 
   /** Check the answer if it was given, if not, just reduce the score.
    * @param result The answer data
