@@ -142,6 +142,7 @@ const useGame = () => {
         isPlaying: false,
       }));
       let _score = state.score;
+      let _time = countDownTime.current;
       let _answerResult: string | undefined;
       let _answerData: IGameAnswer;
       if (answer) {
@@ -150,13 +151,16 @@ const useGame = () => {
       switch (_answerResult) {
         case "correct":
           _score += 5;
+          _time += 1;
           break;
         case "incorrect":
+          _time -= 1;
           if (state.score > 0) {
             _score -= 1;
           }
           break;
         default:
+          _time -= 1;
           if (state.score > 0) {
             _score -= 2;
           }
@@ -177,6 +181,7 @@ const useGame = () => {
         score: _score,
         answers: [...state.answers, _answerData],
       }));
+      countDownTime.current = _time;
       if (countDownTime.current > 0) {
         setTimeout(() => {
           if (countDownTime.current >= 10) {
