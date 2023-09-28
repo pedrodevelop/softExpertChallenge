@@ -4,6 +4,7 @@ import Answer from "./Answer";
 import GameDifficulty from "@/data/contexts/GameDifficultyContext";
 
 interface IGameListProps {
+  /** Game data */
   state: IGameState;
 }
 

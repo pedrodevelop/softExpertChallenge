@@ -2,8 +2,10 @@ import { createContext, useState } from "react";
 
 export type GameDifficults = "" | "Easy" | "Normal"| "Hard"
 
-interface IGameDifficultyProps {
+export interface IGameDifficultyProps {
+  /** Game difficulty */
   difficulty: GameDifficults;
+  /** A function called to set game difficulty */
   handleSetDifficulty: (difficulty: GameDifficults) => void;
 }
 
@@ -12,7 +14,6 @@ const GameDifficulty = createContext<IGameDifficultyProps>({
   handleSetDifficulty: () => {},
 });
 
-// TODO: Add documentation
 export const GameDifficultyProvider: React.FC<any> = ({ children }) => {
   const [difficulty, setDifficulty] = useState<GameDifficults>("");
 

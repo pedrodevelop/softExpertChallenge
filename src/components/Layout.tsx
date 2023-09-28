@@ -29,21 +29,23 @@ const Layout: React.FC = () => {
         handleRestartGame={handleRestartGame}
       />
       <div className="w-1/12 mt-auto mb-10">
-        <button
-          className="w-fit underline"
-          disabled={state.hasGameStarted || state.answers.length == 0}
-          onClick={handleResetGameData}
-        >
-          Reset all data
-        </button>
         {difficulty != "" && (
-          <button
-            className="w-fit underline"
-            disabled={state.hasGameStarted}
-            onClick={() => handleSetDifficulty("")}
-          >
-            Choose difficulty
-          </button>
+          <>
+            <button
+              className="w-fit underline"
+              disabled={state.hasGameStarted || state.answers.length == 0}
+              onClick={handleResetGameData}
+            >
+              Reset all data
+            </button>
+            <button
+              className="w-fit underline"
+              disabled={state.hasGameStarted}
+              onClick={() => handleSetDifficulty("")}
+            >
+              Choose difficulty
+            </button>
+          </>
         )}
       </div>
     </div>

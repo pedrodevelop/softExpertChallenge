@@ -8,11 +8,18 @@ import GameDifficulty, {
 } from "@/data/contexts/GameDifficultyContext";
 
 interface IGameContainerProps {
+  /** Game data */
   state: IGameState;
+  /** Countdown timer showed in game info */
   countDownTime: number;
+  /** Round's progress bar */
   progressBarTime: number;
+  /** Function called to check whether the user has
+   *  selected an answer and whether it is correct or incorrect. */
   handleCheckAnswer: (answer: string) => void;
+  /** Function called to start the game */
   handleStartGame: () => void;
+  /** Function called to restart the game */
   handleRestartGame: () => void;
 }
 
