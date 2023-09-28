@@ -1,6 +1,8 @@
+import { useContext } from "react";
 import GameList from "@/components/gameList";
 import GameContainer from "./gameContainer";
 import useGame from "@/data/hooks/useGame";
+import GameDifficulty from "@/data/contexts/GameDifficultyContext";
 
 const Layout: React.FC = () => {
   const {
@@ -12,6 +14,8 @@ const Layout: React.FC = () => {
     handleRestartGame,
     handleResetGameData,
   } = useGame();
+
+  const { difficulty, handleSetDifficulty } = useContext(GameDifficulty);
 
   return (
     <div className="w-screen h-screen flex flex-row justify-between">
@@ -32,6 +36,15 @@ const Layout: React.FC = () => {
         >
           Reset all data
         </button>
+        {difficulty != "" && (
+          <button
+            className="w-fit underline"
+            disabled={state.hasGameStarted}
+            onClick={() => handleSetDifficulty("")}
+          >
+            Choose difficulty
+          </button>
+        )}
       </div>
     </div>
   );

@@ -21,7 +21,9 @@ const AnswerButtons: React.FC<IAnswerButtonsProps> = ({
       <button
         disabled={!isPlaying}
         onClick={() => sendAnswer()}
-        className={`w-1/3 h-full border-y-2 ${isPlaying && 'hover:bg-gray-100'} ${className}`}
+        className={`w-32 h-full border-l-2 border-y-2 ${
+          isPlaying && "hover:bg-gray-100"
+        } ${className}`}
       >
         {color}
       </button>
