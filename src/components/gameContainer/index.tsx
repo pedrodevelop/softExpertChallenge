@@ -5,6 +5,7 @@ import AnswerButtons from "./AnswerButtons";
 
 interface IGameContainerProps {
   state: IGameState;
+  countDownTime: number;
   progressBarTime: number;
   handleCheckAnswer: (answer: string) => void;
   handleStartGame: () => void;
@@ -13,6 +14,7 @@ interface IGameContainerProps {
 
 const GameContainer: React.FC<IGameContainerProps> = ({
   state,
+  countDownTime,
   progressBarTime,
   handleCheckAnswer,
   handleStartGame,
@@ -27,7 +29,7 @@ const GameContainer: React.FC<IGameContainerProps> = ({
         hasGameStarted={state.hasGameStarted}
         highScore={state.highScore}
         score={state.score}
-        time={state.time}
+        time={countDownTime}
       />
       {/* Game color square with the round's color and the time progress bar */}
       <GameColorSquare
@@ -37,7 +39,6 @@ const GameContainer: React.FC<IGameContainerProps> = ({
         isLastRound={state.isLastRound}
         lastRoundTimeRemaining={state.lastRoundTimeRemaining}
         progressBarTime={progressBarTime}
-        time={state.time}
       />
       {/* Round's answers options */}
       <div className="w-2/6 h-12 font-semibold">
@@ -49,8 +50,8 @@ const GameContainer: React.FC<IGameContainerProps> = ({
               className={`first:rounded-l-md first:border-x-2 last:rounded-r-md last:border-x-2 ${
                 !state.isPlaying
                   ? el == state.currentColor
-                    ? "border-green-500 text-green-500"
-                    : "border-red-500 text-red-500"
+                    ? "bg-green-500 border-green-600 text-white"
+                    : "bg-red-500 border-red-600 text-white"
                   : "border-[#5e676f]"
               }`}
               isPlaying={state.isPlaying}

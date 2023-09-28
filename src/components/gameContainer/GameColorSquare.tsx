@@ -9,8 +9,6 @@ interface IGameColorSquareProps {
   lastRoundTimeRemaining: number | null;
   /** The current progress bar time */
   progressBarTime: number;
-  /** The game remaining time */
-  time: number;
   /** A function to start the game */
   handleStartGame: () => void;
 }
@@ -21,7 +19,6 @@ const GameColorSquare: React.FC<IGameColorSquareProps> = ({
   isLastRound,
   lastRoundTimeRemaining,
   progressBarTime,
-  time,
   handleStartGame,
 }) => {
   // If the game counter is at 10 seconds or more,
@@ -31,7 +28,7 @@ const GameColorSquare: React.FC<IGameColorSquareProps> = ({
   // and N2 is the time that represents 100%.
   const progressBarPercentage = !isLastRound
     ? progressBarTime * 10
-    : (time * 100) / lastRoundTimeRemaining!;
+    : (progressBarTime * 100) / lastRoundTimeRemaining!;
 
   return (
     <div className="flex flex-col w-2/6 h-1/2">

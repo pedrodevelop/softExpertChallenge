@@ -5,6 +5,7 @@ import useGame from "@/data/hooks/useGame";
 const Layout: React.FC = () => {
   const {
     state,
+    countDownTime,
     progressBarTime,
     handleCheckAnswer,
     handleStartGame,
@@ -17,6 +18,7 @@ const Layout: React.FC = () => {
       <GameList state={state} />
       <GameContainer
         state={state}
+        countDownTime={countDownTime}
         progressBarTime={progressBarTime}
         handleCheckAnswer={handleCheckAnswer}
         handleStartGame={handleStartGame}

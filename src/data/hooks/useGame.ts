@@ -47,12 +47,13 @@ const initialState: IGameState = {
   lastRoundTimeRemaining: null,
   options: [],
   score: 0,
-  time: 15,
+  time: 30,
 };
 
 const useGame = () => {
   const [state, setState] = useState<IGameState>(initialState);
   const progressBarTime = useRef<number>(10);
+  const countDownTime = useRef<number>(state.time);
 
   /** Starts the game */
   const handleStartGame = () => {
@@ -60,26 +61,23 @@ const useGame = () => {
     setState((prev) => ({
       ...prev,
       answers: [],
-      isPlaying: true,
       hasGameStarted: true,
     }));
   };
 
   /** Ends the game when the timer reaches 0 */
   const handleStopGame = useCallback(() => {
+    let _highScore: number;
     if (state.score > 0 && state.score > state.highScore) {
-      setState(() => ({
-        ...initialState,
-        highScore: state.score,
-        answers: state.answers,
-      }));
+      _highScore = state.score;
     } else {
-      setState(() => ({
-        ...initialState,
-        highScore: state.highScore,
-        answers: state.answers,
-      }));
+      _highScore = state.highScore;
     }
+    setState(() => ({
+      ...initialState,
+      highScore: _highScore,
+      answers: state.answers,
+    }));
     const gameData = JSON.stringify([
       state.score > 0 && state.score > state.highScore
         ? state.score
@@ -87,14 +85,14 @@ const useGame = () => {
       state.answers,
     ]);
     localStorage.setItem("gameData", gameData);
-
     progressBarTime.current = 10;
+    countDownTime.current = initialState.time;
   }, [state.score, state.highScore, state.answers]);
 
   /** Restart the game by deleting all match data */
   const handleRestartGame = () => {
     const gameDataStorage = localStorage.getItem("gameData");
-    if (state.highScore > 0 && state.answers && gameDataStorage) {
+    if (gameDataStorage) {
       const gameData = JSON.parse(gameDataStorage);
       setState(() => ({
         ...initialState,
@@ -105,10 +103,11 @@ const useGame = () => {
       setState(initialState);
     }
     progressBarTime.current = 10;
+    countDownTime.current = initialState.time;
   };
 
   /** Creates a game round */
-  const handleCreateRound = () => {
+  const handleCreateRound = useCallback(() => {
     const _currentColor: string = generateRandomColor();
     // Creates an array to store both incorrect
     // and the correct answer options
@@ -130,7 +129,8 @@ const useGame = () => {
       options: _options,
       isPlaying: true,
     }));
-  };
+    console.log(_currentColor);
+  }, []);
 
   /** Check the answer if it was given, if not, just reduce the score.
    * @param result The answer data
@@ -177,21 +177,22 @@ const useGame = () => {
         score: _score,
         answers: [...state.answers, _answerData],
       }));
-      if (state.time - 1 != 0) {
+      if (countDownTime.current > 0) {
         setTimeout(() => {
-          if (state.time >= 10) {
+          if (countDownTime.current >= 10) {
             progressBarTime.current = 10;
+            countDownTime.current -= 1;
           } else {
+            countDownTime.current -= 1;
             setState((prev) => ({
               ...prev,
               isLastRound: true,
-              lastRoundTimeRemaining:
-                answer == "" ? state.time - 1 : state.time,
+              lastRoundTimeRemaining: countDownTime.current,
             }));
-            progressBarTime.current = state.time;
+            progressBarTime.current = countDownTime.current;
           }
           handleCreateRound();
-        }, 1500);
+        }, 750);
       } else {
         setState((prev) => ({
           ...prev,
@@ -200,12 +201,12 @@ const useGame = () => {
       }
     },
     [
+      handleCreateRound,
       state.answers,
       state.currentColor,
       state.isLastRound,
       state.lastRoundTimeRemaining,
       state.score,
-      state.time,
     ]
   );
 
@@ -231,19 +232,20 @@ const useGame = () => {
 
   useEffect(() => {
     let countdownTimer: NodeJS.Timeout;
-    if (state.hasGameStarted && state.time > 0) {
-      if (state.isPlaying) {
-        countdownTimer = setTimeout(() => {
-          setState((prev) => ({
-            ...prev,
-            time: state.time - 1,
-          }));
+    if (state.hasGameStarted && countDownTime.current > 0) {
+      countdownTimer = setTimeout(() => {
+        setState((prev) => ({
+          ...prev,
+          time: state.time - 1,
+        }));
+        countDownTime.current -= 1;
+        if (state.isPlaying) {
           progressBarTime.current -= 1;
-          if (progressBarTime.current == 0 && state.time - 1 != 0) {
-            handleCheckAnswer("");
-          }
-        }, 1000);
-      }
+        }
+        if (progressBarTime.current == 0 && countDownTime.current > 0) {
+          handleCheckAnswer("");
+        }
+      }, 1000);
     } else {
       if (state.isPlaying) {
         handleStopGame();
@@ -260,6 +262,7 @@ const useGame = () => {
   ]);
 
   return {
+    countDownTime: countDownTime.current,
     progressBarTime: progressBarTime.current,
     state,
     handleCheckAnswer,
